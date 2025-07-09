@@ -1,8 +1,9 @@
 <template>
     <div class="card">
         <div class="flex items-center gap-4 mb-4">
-            <input v-model="filter" type="text" placeholder="搜尋道具名稱..." class="p-2 border rounded text-base flex-1" />
-            <Select v-model="sortKey" :options="sortOptions" optionLabel="label" placeholder="排序方式"
+            <input v-model="filter" type="text" placeholder="Search Item Name..."
+                class="p-2 border rounded text-base flex-1" />
+            <Select v-model="sortKey" :options="sortOptions" optionLabel="label" placeholder="Sort by"
                 @change="onSortChange($event)" class="w-48" />
         </div>
         <DataView :value="sortedItems" paginator :rows="20">
@@ -23,7 +24,7 @@
                                 </div>
                                 <div class="flex items-center justify-end gap-4">
                                     <div class="text-xs text-gray-500 mt-1">
-                                        上次更新：{{ formatTime(item.timestamp) }}
+                                        updated：{{ formatTime(item.timestamp) }}
                                     </div>
                                     <span class="text-md font-semibold">
                                         ${{ formatPrice(item.price) }}
@@ -59,9 +60,9 @@ const sortKey = ref();
 const sortOrder = ref();
 const sortField = ref();
 const sortOptions = ref([
-    { label: '價格高到低', value: '!price' },
-    { label: '價格低到高', value: 'price' },
-    { label: '只顯示已追蹤', value: 'followed' }, // 新增
+    { label: 'Price: High to Low', value: '!price' },
+    { label: 'Price: Low to High', value: 'price' },
+    { label: 'Show Followed', value: 'followed' }, // 新增
 ]);
 function isFollowed(name) {
     return followedStore.followedNames.includes(name);
