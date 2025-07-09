@@ -2,6 +2,7 @@
   <div class="layout-root light-bg">
     <header class="topbar glass-light">
       <div class="logo-title" style="margin-left: 20px;">
+        <img src="/icon.png" alt="logo" class="logo" style="width: 30px; height: 30px;">
         <span class="title">MapleStoryN Price Watcher</span>
       </div>
       <!-- 右側可加選單或按鈕 -->
@@ -24,9 +25,11 @@
   display: flex;
   flex-direction: column;
 }
+
 .light-bg {
   background: #f7fafc;
 }
+
 .topbar {
   position: fixed;
   height: 4rem;
@@ -39,15 +42,17 @@
   align-items: center;
   justify-content: space-between;
   border-radius: 1.5rem;
-  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.06);
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.06);
 }
+
 .glass-light {
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(10px) saturate(180%);
   -webkit-backdrop-filter: blur(10px) saturate(180%);
   border-bottom: 1px solid #e5e7eb;
-  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.03);
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.03);
 }
+
 .logo-title {
   display: flex;
   align-items: center;
@@ -55,15 +60,18 @@
   padding-left: 1rem;
   flex: 1;
 }
+
 .title {
   font-size: 1.25rem;
   font-weight: bold;
   color: #22223b;
 }
+
 .main-content {
   flex: 1;
   padding-top: 4rem;
 }
+
 .footer-light {
   background: #f1f5f9;
   text-align: center;
@@ -72,4 +80,4 @@
   color: #64748b;
   border-top: 1px solid #e5e7eb;
 }
-</style> 
+</style>
