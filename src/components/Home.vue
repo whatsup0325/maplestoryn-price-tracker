@@ -15,13 +15,13 @@
                             <div class="relative">
                                 <img class="block xl:block mx-auto rounded w-[30px] h-[30px]" :src="item.imageUrl" />
                             </div>
-                            <div class="flex flex-col md:flex-row justify-between md:items-center flex-1 gap-4">
-                                <div class="flex flex-row md:flex-col justify-between items-start gap-2">
-                                    <div class="text-md font-bold mt-2" style="width: 300px">
+                            <div class="flex flex-col md:flex-row justify-between  md:items-center flex-1 gap-4">
+                                <div class="flex flex-row md:flex-col justify-end items-start gap-2">
+                                    <div class="text-md font-bold mt-2">
                                         {{ item.name }}
                                     </div>
                                 </div>
-                                <div class="flex items-center gap-4">
+                                <div class="flex items-center justify-end gap-4">
                                     <div class="text-xs text-gray-500 mt-1">
                                         上次更新：{{ formatTime(item.timestamp) }}
                                     </div>
@@ -124,7 +124,12 @@ function goToLink(id) {
 onMounted(async () => {
     loading.value = true;
     try {
-        const url = '/api-prices/prices.csv?_=' + Date.now();
+        const isProd = import.meta.env.PROD;
+        const baseUrl = isProd
+            ? 'https://aioblob.blob.core.windows.net/msn'
+            : '/api-prices';
+
+        const url = `${baseUrl}/prices.csv?_=${Date.now()}`;
         const res = await fetch(url);
         if (!res.ok) throw new Error('下載失敗');
         const text = await res.text();

@@ -3,7 +3,7 @@
     <header class="topbar glass-light">
       <div class="logo-title" style="margin-left: 20px;">
         <img src="/icon.png" alt="logo" class="logo" style="width: 30px; height: 30px;">
-        <span class="title">MapleStoryN Price Watcher</span>
+        <span class="title">MapleStoryN Price Tracker</span>
       </div>
       <!-- 右側可加選單或按鈕 -->
     </header>
@@ -11,7 +11,7 @@
       <router-view />
     </main>
     <footer class="footer-light">
-      &copy; 2025 MapleStoryN Price Watcher
+      &copy; 2025 MapleStoryN Price Tracker
     </footer>
   </div>
 </template>

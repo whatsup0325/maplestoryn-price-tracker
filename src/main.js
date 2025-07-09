@@ -13,7 +13,7 @@ import 'primeicons/primeicons.css'
 import PrimeVue from 'primevue/config';
 
 const router = createRouter({
-    history: createWebHistory(),
+    history: createWebHistory(import.meta.env.BASE_URL),
     routes,
 })
 const MyPreset = definePreset(Aura, {
