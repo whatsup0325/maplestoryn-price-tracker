@@ -40,6 +40,9 @@
     </main>
     <footer class="footer-light">
       &copy; 2025 MapleStoryN Price Tracker
+      <div class="footer-contact">
+        Contact: <a href="mailto:whatsup0325@gmail.com" class="footer-link">whatsup0325@gmail.com</a>
+      </div>
     </footer>
   </div>
 </template>
@@ -157,5 +160,20 @@ function showSponsor() {
 
 .sponsor-btn:hover {
   background: #be185d;
+}
+
+.footer-contact {
+  margin-top: 4px;
+  font-size: 0.85em;
+}
+
+.footer-link {
+  color: #2563eb;
+  text-decoration: underline;
+  margin-left: 4px;
+}
+
+.footer-link:hover {
+  color: #1d4ed8;
 }
 </style>

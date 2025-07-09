@@ -122,23 +122,29 @@ function goToLink(id) {
     window.open(`https://msu.io/marketplace/nft/${id}`, '_blank');
 }
 
-onMounted(async () => {
+async function fetchAllPrices() {
     loading.value = true;
     try {
         const isProd = import.meta.env.PROD;
         const baseUrl = isProd
             ? 'https://aioblob.blob.core.windows.net/msn'
             : '/api-prices';
-
-        const url = `${baseUrl}/prices.csv?_=${Date.now()}`;
-        const res = await fetch(url);
-        if (!res.ok) throw new Error('下載失敗');
-        const text = await res.text();
-        const lines = text.trim().split('\n');
-        // 取得標題
-        const [header, ...rows] = lines;
-        // 解析每一行為物件
-        items.value = rows.map((line) => {
+        const fileNames = Array.from({ length: 30 }, (_, i) => `${baseUrl}/prices_${i + 1}.csv?_=${Date.now()}`);
+        const fetchPromises = fileNames.map(url => fetch(url).then(res => {
+            if (!res.ok) throw new Error(`下載失敗: ${url}`);
+            return res.text();
+        }));
+        const results = await Promise.allSettled(fetchPromises);
+        let allRows = [];
+        for (const result of results) {
+            if (result.status === 'fulfilled') {
+                const text = result.value;
+                const lines = text.trim().split('\n');
+                const [header, ...rows] = lines;
+                allRows = allRows.concat(rows);
+            }
+        }
+        items.value = allRows.map((line) => {
             const [name, price, imageUrl, timestamp, id] = line.split(',');
             return { name, price, imageUrl, timestamp, id };
         });
@@ -147,6 +153,11 @@ onMounted(async () => {
     } finally {
         loading.value = false;
     }
+}
+
+onMounted(() => {
+    fetchAllPrices();
+    setInterval(fetchAllPrices, 600000); // 每10分鐘自動重抓
 });
 </script>
 
