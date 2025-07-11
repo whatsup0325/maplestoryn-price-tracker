@@ -195,7 +195,7 @@ function formatPrice(val) {
 function goToLink(name) {
     if (!name) return;
     const keyword = encodeURIComponent(name).replace(/%20/g, '+');
-    window.open(`https://msu.io/marketplace/nft?keyword=${keyword}`, '_blank');
+    window.open(`https://msu.io/marketplace/nft?keyword=${keyword}&sort=ExploreSorting_LOWEST_PRICE`, '_blank');
 }
 
 
