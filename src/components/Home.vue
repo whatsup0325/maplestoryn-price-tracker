@@ -79,7 +79,8 @@ const sortOptions = ref([
     { label: 'Price: High to Low', value: '!price' },
     { label: 'Price: Low to High', value: 'price' },
     { label: 'Show Followed', value: 'followed' },
-    { label: 'Show Ignored', value: 'ignored' }, // 新增
+    { label: 'Show Unfollowed', value: 'unfollowed' },
+    { label: 'Show Ignored', value: 'ignored' },
 ]);
 function isFollowed(name) {
     return followedStore.followedNames.includes(name);
@@ -121,6 +122,15 @@ const sortedItems = computed(() => {
         // 只顯示被忽略的商品，並依金額排序
         const ignored = filteredItems.value.filter(item => isIgnored(item.name));
         return [...ignored].sort((a, b) => {
+            const aPrice = Number(a.currPriceWei) || 0;
+            const bPrice = Number(b.currPriceWei) || 0;
+            return sortOrder.value === -1 ? bPrice - aPrice : aPrice - bPrice;
+        });
+    }
+    if (sortField.value === 'unfollowed') {
+        // 只顯示未追蹤的商品，並依金額排序
+        const unfollowed = filteredItems.value.filter(item => !isFollowed(item.name));
+        return [...unfollowed].sort((a, b) => {
             const aPrice = Number(a.currPriceWei) || 0;
             const bPrice = Number(b.currPriceWei) || 0;
             return sortOrder.value === -1 ? bPrice - aPrice : aPrice - bPrice;
