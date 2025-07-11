@@ -184,7 +184,7 @@ async function fetchAllPrices() {
 
 onMounted(() => {
     fetchAllPrices();
-    setInterval(fetchAllPrices, 60000); // 每10分鐘自動重抓
+    setInterval(fetchAllPrices, 60000); // 每1分鐘自動重抓
 });
 </script>
 
