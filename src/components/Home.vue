@@ -14,11 +14,12 @@
                             'border-t border-surface-200 dark:border-surface-700': index !== 0
                         }">
                             <div class="relative">
-                                <img class="block xl:block mx-auto rounded w-[30px] h-[30px]" :src="item.imageUrl" />
+                                <img class="block xl:block mx-auto rounded w-[30px] h-[30px] cursor-pointer"
+                                    :src="item.imageUrl" @click="goToLink(item.name)" />
                             </div>
                             <div class="flex flex-col md:flex-row justify-between  md:items-center flex-1 gap-4">
                                 <div class="flex flex-row md:flex-col justify-end items-start gap-2">
-                                    <div class="text-md font-bold mt-2">
+                                    <div class="text-md font-bold mt-2 cursor-pointer" @click="goToLink(item.name)">
                                         {{ item.name }}
                                     </div>
                                 </div>
