@@ -3,7 +3,7 @@
     <header class="topbar glass-light">
       <div class="logo-title" style="margin-left: 20px;">
         <img src="/icon.png" alt="logo" class="logo" style="width: 30px; height: 30px;">
-        <span class="title">MSU NFT Collection Tracker</span>
+        <span class="title">MSU NFT Tracker</span>
       </div>
       <!-- 右側可加選單或按鈕 -->
       <div class="github-star" style="margin-right: 12px;">

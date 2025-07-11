@@ -128,12 +128,26 @@ function onSortChange(event) {
 
 function formatTime(ts) {
     if (!ts) return '';
-    const date = new Date(ts);
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${month}-${day} ${hours}:${minutes}`;
+    // 處理 ISO 8601 格式或 Unix timestamp
+    let timestamp;
+    if (ts.includes('T')) {
+        // ISO 8601 格式，直接使用
+        timestamp = new Date(ts).getTime();
+    } else {
+        // Unix timestamp (秒)，轉換為毫秒
+        timestamp = ts.length === 10 ? Number(ts) * 1000 : Number(ts);
+    }
+    const now = Date.now();
+    const diff = now - timestamp;
+
+    const minutes = Math.floor(diff / (1000 * 60));
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+    if (minutes < 1) return 'just now';
+    if (minutes < 60) return `${minutes}min ago`;
+    if (hours < 24) return `${hours}h ago`;
+    return `${days}d ago`;
 }
 
 function formatPrice(val) {
@@ -174,7 +188,6 @@ async function fetchAllPrices() {
             const updateTime = row[7];
             return { name, price, imageUrl, timestamp, id, currPriceWei, prevPriceWei, updateTime };
         });
-        console.log(items.value);
     } catch (e) {
         error.value = e.message;
     } finally {
