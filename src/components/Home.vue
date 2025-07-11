@@ -24,16 +24,29 @@
                                 </div>
                                 <div class="flex items-center justify-end gap-4">
                                     <div class="text-xs text-gray-500 mt-1">
-                                        updated：{{ formatTime(item.timestamp) }}
+                                        {{ formatTime(item.updateTime) }}
                                     </div>
-                                    <span class="text-md font-semibold">
-                                        ${{ formatPrice(item.price) }}
+                                    <span class="text-md font-semibold text-right flex justify-end"
+                                        style="min-width: 100px;">
+                                        ${{ formatPrice(item.currPriceWei) }}
+                                        <div style="width: 20px; text-align: center; margin-left: 10px;">
+                                            <span v-if="item.currPriceWei > item.prevPriceWei"
+                                                class="text-red-500">↑</span>
+                                            <span v-else-if="item.currPriceWei < item.prevPriceWei"
+                                                class="text-green-500 ">↓</span>
+
+                                            <span v-else-if="item.currPriceWei === item.prevPriceWei"
+                                                class="text-gray-500">=</span>
+                                        </div>
                                     </span>
+                                    <div class="text-xs text-gray-500 text-right" style="width: 100px;">
+                                        prev: ${{ formatPrice(item.prevPriceWei) }}
+                                    </div>
                                     <Button icon="pi pi-heart" :severity="isFollowed(item.name) ? 'danger' : 'primary'"
                                         :outlined="!isFollowed(item.name)" style="width: 35px; height: 35px"
                                         @click="isFollowed(item.name) ? followedStore.unfollow(item.name) : followedStore.follow(item.name)"></Button>
                                     <Button icon="pi pi-link" style="width: 35px; height: 35px"
-                                        @click="goToLink(item.id)"></Button>
+                                        @click="goToLink(item.name)"></Button>
                                 </div>
                             </div>
                         </div>
@@ -56,9 +69,9 @@ const loading = ref(false);
 const error = ref('');
 const filter = ref('');
 const followedStore = useFollowedItemsStore();
-const sortKey = ref();
-const sortOrder = ref();
-const sortField = ref();
+const sortKey = ref({ label: 'Price: Low to High', value: 'price' });
+const sortOrder = ref(1);
+const sortField = ref('price');
 const sortOptions = ref([
     { label: 'Price: High to Low', value: '!price' },
     { label: 'Price: Low to High', value: 'price' },
@@ -78,13 +91,18 @@ const filteredItems = computed(() => {
 
 const sortedItems = computed(() => {
     if (sortField.value === 'followed') {
-        // 只顯示已追蹤
-        return filteredItems.value.filter(item => isFollowed(item.name));
+        // 只顯示已追蹤，並依金額排序
+        const followed = filteredItems.value.filter(item => isFollowed(item.name));
+        return [...followed].sort((a, b) => {
+            const aPrice = Number(a.currPriceWei) || 0;
+            const bPrice = Number(b.currPriceWei) || 0;
+            return sortOrder.value === -1 ? bPrice - aPrice : aPrice - bPrice;
+        });
     }
     if (!sortField.value) return filteredItems.value;
     const sorted = [...filteredItems.value].sort((a, b) => {
-        const aPrice = Number(a.price) || 0;
-        const bPrice = Number(b.price) || 0;
+        const aPrice = Number(a.currPriceWei) || 0;
+        const bPrice = Number(b.currPriceWei) || 0;
         if (sortOrder.value === -1) {
             return bPrice - aPrice;
         } else {
@@ -109,7 +127,13 @@ function onSortChange(event) {
 }
 
 function formatTime(ts) {
-    return new Date(ts).toLocaleString();
+    if (!ts) return '';
+    const date = new Date(ts);
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${month}-${day} ${hours}:${minutes}`;
 }
 
 function formatPrice(val) {
@@ -117,9 +141,10 @@ function formatPrice(val) {
     return Number(val).toLocaleString();
 }
 
-function goToLink(id) {
-    if (!id) return;
-    window.open(`https://msu.io/marketplace/nft/${id}`, '_blank');
+function goToLink(name) {
+    if (!name) return;
+    const keyword = encodeURIComponent(name).replace(/%20/g, '+');
+    window.open(`https://msu.io/marketplace/nft?keyword=${keyword}`, '_blank');
 }
 
 async function fetchAllPrices() {
@@ -129,25 +154,27 @@ async function fetchAllPrices() {
         const baseUrl = isProd
             ? 'https://aioblob.blob.core.windows.net/msn'
             : '/api-prices';
-        const fileNames = Array.from({ length: 30 }, (_, i) => `${baseUrl}/prices_${i + 1}.csv?_=${Date.now()}`);
-        const fetchPromises = fileNames.map(url => fetch(url).then(res => {
-            if (!res.ok) throw new Error(`下載失敗: ${url}`);
-            return res.text();
-        }));
-        const results = await Promise.allSettled(fetchPromises);
-        let allRows = [];
-        for (const result of results) {
-            if (result.status === 'fulfilled') {
-                const text = result.value;
-                const lines = text.trim().split('\n');
-                const [header, ...rows] = lines;
-                allRows = allRows.concat(rows);
-            }
-        }
-        items.value = allRows.map((line) => {
-            const [name, price, imageUrl, timestamp, id] = line.split(',');
-            return { name, price, imageUrl, timestamp, id };
+        const url = `${baseUrl}/all_item_with_price.csv?_=${Date.now()}`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`下載失敗: ${url}`);
+        const text = await res.text();
+        const lines = text.trim().split('\n');
+        const [header, ...rows] = lines;
+
+        items.value = rows.map((line) => {
+            const row = line.split(',');
+
+            const name = row[0];
+            const price = row[1];
+            const imageUrl = row[2];
+            const timestamp = row[3];
+            const id = row[4];
+            const currPriceWei = (BigInt(row[5]) / 10n ** 18n);
+            const prevPriceWei = (BigInt(row[6]) / 10n ** 18n);
+            const updateTime = row[7];
+            return { name, price, imageUrl, timestamp, id, currPriceWei, prevPriceWei, updateTime };
         });
+        console.log(items.value);
     } catch (e) {
         error.value = e.message;
     } finally {
@@ -157,7 +184,7 @@ async function fetchAllPrices() {
 
 onMounted(() => {
     fetchAllPrices();
-    setInterval(fetchAllPrices, 600000); // 每10分鐘自動重抓
+    setInterval(fetchAllPrices, 60000); // 每10分鐘自動重抓
 });
 </script>
 

@@ -3,7 +3,7 @@
     <header class="topbar glass-light">
       <div class="logo-title" style="margin-left: 20px;">
         <img src="/icon.png" alt="logo" class="logo" style="width: 30px; height: 30px;">
-        <span class="title">MapleStoryN Price Tracker</span>
+        <span class="title">MSU NFT Collection Tracker</span>
       </div>
       <!-- 右側可加選單或按鈕 -->
       <div class="github-star" style="margin-right: 12px;">
@@ -16,7 +16,7 @@
           </svg>
         </a>
       </div>
-      <!-- <div class="sponsor-btn-wrap" style="margin-right: 12px;">
+      <div class="sponsor-btn-wrap" style="margin-right: 12px;">
         <button class="sponsor-btn" @click="showSponsor()">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24"
             style="vertical-align: middle; margin-top: 2px;">
@@ -24,16 +24,18 @@
               d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
           </svg>
         </button>
-        <Dialog v-model:visible="sponsorVisible" modal header="Sponsor" :style="{ width: '350px' }">
+        <Dialog v-model:visible="sponsorVisible" modal header="Sponsor" :style="{ width: '550px' }">
           <div style="text-align: center;">
             <div style="font-size: 1.1rem; margin-bottom: 12px;">Thank you for your support!</div>
+            <div style="font-size: 0.95rem;">純興趣開發，你的支持是我更新的最大的動力！</div>
+            <div style="font-size: 0.95rem; margin-bottom: 12px;">如果你有任何問題，歡迎聯繫我！</div>
             <div style="font-size: 0.95rem; color: #64748b; margin-bottom: 8px;">Wallet address:</div>
             <div
               style="font-family: monospace; font-size: 1rem; background: #f1f5f9; padding: 8px 12px; border-radius: 6px; word-break: break-all;">
-              0x1234abcd5678efgh9012ijkl3456mnop7890qrst</div>
+              0xFC4f4eF1900Df284a2dc507BaeA19fd98b7994A6</div>
           </div>
         </Dialog>
-      </div> -->
+      </div>
     </header>
     <main class="main-content">
       <router-view />
