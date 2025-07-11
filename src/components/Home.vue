@@ -45,6 +45,9 @@
                                     <Button icon="pi pi-heart" :severity="isFollowed(item.name) ? 'danger' : 'primary'"
                                         :outlined="!isFollowed(item.name)" style="width: 35px; height: 35px"
                                         @click="isFollowed(item.name) ? followedStore.unfollow(item.name) : followedStore.follow(item.name)"></Button>
+                                    <Button icon="pi pi-ban" :severity="isIgnored(item.name) ? 'primary' : 'secondary'"
+                                        style="width: 35px; height: 35px"
+                                        @click="isIgnored(item.name) ? followedStore.unignore(item.name) : ignoreItem(item.name)"></Button>
                                     <Button icon="pi pi-link" style="width: 35px; height: 35px"
                                         @click="goToLink(item.name)"></Button>
                                 </div>
@@ -75,16 +78,31 @@ const sortField = ref('price');
 const sortOptions = ref([
     { label: 'Price: High to Low', value: '!price' },
     { label: 'Price: Low to High', value: 'price' },
-    { label: 'Show Followed', value: 'followed' }, // 新增
+    { label: 'Show Followed', value: 'followed' },
+    { label: 'Show Ignored', value: 'ignored' }, // 新增
 ]);
 function isFollowed(name) {
     return followedStore.followedNames.includes(name);
 }
 
+function isIgnored(name) {
+    return followedStore.ignoreNames.includes(name);
+}
+
+function ignoreItem(name) {
+    followedStore.ignore(name)
+}
 
 const filteredItems = computed(() => {
-    if (!filter.value) return items.value;
-    return items.value.filter(item =>
+    let filtered = items.value;
+
+    // 只有在非 "Show Ignored" 模式下才過濾掉被忽略的商品
+    if (sortField.value !== 'ignored') {
+        filtered = filtered.filter(item => !isIgnored(item.name));
+    }
+
+    if (!filter.value) return filtered;
+    return filtered.filter(item =>
         item.name && item.name.toLowerCase().includes(filter.value.toLowerCase())
     );
 });
@@ -94,6 +112,15 @@ const sortedItems = computed(() => {
         // 只顯示已追蹤，並依金額排序
         const followed = filteredItems.value.filter(item => isFollowed(item.name));
         return [...followed].sort((a, b) => {
+            const aPrice = Number(a.currPriceWei) || 0;
+            const bPrice = Number(b.currPriceWei) || 0;
+            return sortOrder.value === -1 ? bPrice - aPrice : aPrice - bPrice;
+        });
+    }
+    if (sortField.value === 'ignored') {
+        // 只顯示被忽略的商品，並依金額排序
+        const ignored = filteredItems.value.filter(item => isIgnored(item.name));
+        return [...ignored].sort((a, b) => {
             const aPrice = Number(a.currPriceWei) || 0;
             const bPrice = Number(b.currPriceWei) || 0;
             return sortOrder.value === -1 ? bPrice - aPrice : aPrice - bPrice;
@@ -160,6 +187,7 @@ function goToLink(name) {
     const keyword = encodeURIComponent(name).replace(/%20/g, '+');
     window.open(`https://msu.io/marketplace/nft?keyword=${keyword}`, '_blank');
 }
+
 
 async function fetchAllPrices() {
     loading.value = true;
